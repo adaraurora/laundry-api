@@ -19,4 +19,16 @@ class Order extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    public function byUser($user_id) {
+       return Order::where('user_id', $user_id)->get();
+
+       $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'layanan' => 'required',
+            'berat' => 'required|numeric|min:1'
+        ]);
+    }
+
+    
 }
