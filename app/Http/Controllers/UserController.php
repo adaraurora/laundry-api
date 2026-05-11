@@ -39,6 +39,17 @@ class UserController extends Controller
     public function update(Request $request, $id) {
         $user = User::find($id);
 
+        $request->validate([
+        'name' => 'required',
+        'email' => 'required|email'
+        ]);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
@@ -49,8 +60,15 @@ class UserController extends Controller
     }
 
     public function destroy($id) {
-        User::find($id)->delete();
-        return response()->json(['message' => 'deleted']);
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+
+        $user->delete();
     }
 
     public function login(Request $request)
@@ -71,10 +89,32 @@ class UserController extends Controller
             ]);
         }
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'status' => true,
             'message' => 'login berhasil',
+            'token' => $token,
+            'data' => $user
+        ]);
+    }
+
+    public function profile($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
             'data' => $user
         ]);
     }
 }
+
+

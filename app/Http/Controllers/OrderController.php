@@ -18,6 +18,12 @@ class OrderController extends Controller
         $harga_per_kg = 5000;
         $total = $request->berat * $harga_per_kg;
 
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'layanan' => 'required',
+            'berat' => 'required|numeric|min:1'
+        ]);
+
         $order = Order::create([
             'user_id' => $request->user_id,
             'layanan' => $request->layanan,
@@ -26,7 +32,11 @@ class OrderController extends Controller
             'status' => 'proses'
         ]);
 
-        return response()->json($order);
+        return response()->json([
+            'status' => true,
+            'message' => 'Pesanan berhasil dibuat',
+            'data' => $order
+        ]);
     }
 
     // Melihat detail satu pesanan secara spesifik
@@ -46,7 +56,10 @@ class OrderController extends Controller
         if (!$order) {
             return response()->json(['message' => 'Pesanan tidak ditemukan'], 404);
         }
-        $order->update($request->all());
+        $order->update([
+            'layanan' => $request->layanan,
+            'berat' => $request->berat
+        ]);
         return response()->json($order);
     }
 
@@ -89,5 +102,22 @@ class OrderController extends Controller
             return response()->json(['message' => 'Pesanan berhasil dihapus']);
         }
         return response()->json(['message' => 'Pesanan tidak ditemukan'], 404);
+    }
+
+    public function byUser($id)
+    {
+        $orders = Order::where('user_id', $id)->get();
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'layanan' => 'required',
+            'berat' => 'required|numeric|min:1'
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data order user berhasil diambil',
+            'data' => $orders
+        ]);
     }
 }

@@ -24,8 +24,11 @@ Route::prefix('users')->group(function () {
     Route::post('/', [UserController::class, 'store']);
     Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/{id}', [UserController::class, 'destroy']);
-    Route::post('/login', [UserController::class, 'login']);
+    Route::get('/{id}/orders', [OrderController::class, 'byUser']);
 });
+
+Route::post('/login', [UserController::class, 'login']);
+Route::get('/profile/{id}', [UserController::class, 'profile']);
 
 // --- API SERVICES ---
 Route::prefix('services')->group(function () {
@@ -46,3 +49,4 @@ Route::prefix('orders')->group(function () {
     // Update status laundry (Hanya bisa ditembak kalau kirim admin_id)
     Route::put('/{id}/status', [OrderController::class, 'updateStatus']); 
 });
+

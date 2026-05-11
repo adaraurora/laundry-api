@@ -53,4 +53,47 @@ class ServiceController extends Controller
         }
         return response()->json($service);
     }
+
+    public function update(Request $request, $id)
+    {
+        $service = Service::find($id);
+
+        if (!$service) {
+            return response()->json([
+                'message' => 'Layanan tidak ditemukan'
+            ], 404);
+        }
+
+        $service->update([
+            'nama_layanan' => $request->nama_layanan,
+            'deskripsi' => $request->deskripsi,
+            'harga' => $request->harga,
+            'satuan' => $request->satuan,
+            'image' => $request->image,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Layanan berhasil diupdate',
+            'data' => $service
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $service = Service::find($id);
+
+        if (!$service) {
+            return response()->json([
+                'message' => 'Layanan tidak ditemukan'
+            ], 404);
+        }
+
+        $service->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Layanan berhasil dihapus'
+        ]);
+    }
 }
