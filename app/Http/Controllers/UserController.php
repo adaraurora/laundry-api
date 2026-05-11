@@ -52,4 +52,29 @@ class UserController extends Controller
         User::find($id)->delete();
         return response()->json(['message' => 'deleted']);
     }
+
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'email tidak ditemukan'
+            ]);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'password salah'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'login berhasil',
+            'data' => $user
+        ]);
+    }
 }
