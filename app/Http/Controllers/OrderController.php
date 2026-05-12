@@ -109,12 +109,6 @@ class OrderController extends Controller
     {
         $orders = Order::where('user_id', $id)->get();
 
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'layanan' => 'required',
-            'berat' => 'required|numeric|min:1'
-        ]);
-
         return response()->json([
             'status' => true,
             'message' => 'Data order user berhasil diambil',
