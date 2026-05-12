@@ -58,7 +58,8 @@ class OrderController extends Controller
         }
         $order->update([
             'layanan' => $request->layanan,
-            'berat' => $request->berat
+            'berat' => $request->berat,
+            'total_harga' => $total
         ]);
         return response()->json($order);
     }
