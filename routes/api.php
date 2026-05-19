@@ -5,48 +5,37 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\WalletTransactionController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
+Route::post('/login', [UserController::class, 'login']);
+Route::post('/register', [UserController::class, 'store']);
 
-// Endpoint Autentikasi & Profil (Sanctum)
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/profile/{id}', [UserController::class, 'profile']);
 
-// --- API USERS ---
+Route::post('/users/{id}/topup', [UserController::class, 'topUp']);
+Route::get('/users/{id}/wallet-transactions', [WalletTransactionController::class, 'byUser']);
+
 Route::prefix('users')->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::get('/{id}', [UserController::class, 'show']);
-    Route::post('/', [UserController::class, 'store']);
     Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/{id}', [UserController::class, 'destroy']);
     Route::get('/{id}/orders', [OrderController::class, 'byUser']);
 });
 
-Route::post('/login', [UserController::class, 'login']);
-Route::get('/profile/{id}', [UserController::class, 'profile']);
-
-// --- API SERVICES ---
 Route::prefix('services')->group(function () {
-    Route::get('/', [ServiceController::class, 'index']);      // Menampilkan semua layanan
-    Route::get('/{id}', [ServiceController::class, 'show']);   // Detail satu layanan
-    Route::post('/', [ServiceController::class, 'store']);     // Tambah layanan
-    Route::put('/{id}', [ServiceController::class, 'update']); // Edit layanan
-    Route::delete('/{id}', [ServiceController::class, 'destroy']); // Hapus layanan
+    Route::get('/', [ServiceController::class, 'index']);
+    Route::get('/{id}', [ServiceController::class, 'show']);
+    Route::post('/', [ServiceController::class, 'store']);
+    Route::put('/{id}', [ServiceController::class, 'update']);
+    Route::delete('/{id}', [ServiceController::class, 'destroy']);
 });
 
-// --- API ORDERS ---
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::post('/', [OrderController::class, 'store']);
     Route::get('/{id}', [OrderController::class, 'show']);
     Route::put('/{id}', [OrderController::class, 'update']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
-    // Update status laundry (Hanya bisa ditembak kalau kirim admin_id)
-    Route::put('/{id}/status', [OrderController::class, 'updateStatus']); 
+    Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
 });
-

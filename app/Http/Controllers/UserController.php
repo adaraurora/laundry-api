@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\WalletTransaction;
 
 class UserController extends Controller
 {
@@ -16,48 +17,31 @@ class UserController extends Controller
         return User::find($id);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request) 
+    {
         $request->validate([
-        'name' => 'required',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|min:6'
+            'name' => 'required',
+            'phone' => 'required|unique:users,phone',
+            'email' => 'nullable|email|unique:users,email',
+            'password' => 'required|min:6'
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'alamat' => $request->alamat,
-            'role' => $request->role
+            'role' => $request->role ?? 'user',
+            'saldo' => 750000,
+            'poin' => 1200
         ]);
 
         return response()->json([
             'status' => true,
+            'message' => 'Registrasi berhasil',
             'data' => $user
         ]);
-    }
-
-    public function update(Request $request, $id) {
-        $user = User::find($id);
-
-        $request->validate([
-        'name' => 'required',
-        'email' => 'required|email'
-        ]);
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'User tidak ditemukan'
-            ], 404);
-        }
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'alamat' => $request->alamat
-        ]);
-
-        return response()->json($user);
     }
 
     public function destroy($id) {
@@ -74,27 +58,34 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $request->validate([
+            'login' => 'required',
+            'password' => 'required'
+        ]);
+
+        $user = User::where('email', $request->login)
+            ->orWhere('phone', $request->login)
+            ->first();
 
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => 'email tidak ditemukan'
-            ]);
+                'message' => 'Akun tidak ditemukan'
+            ], 404);
         }
 
         if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'password salah'
-            ]);
+                'message' => 'Password salah'
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'status' => true,
-            'message' => 'login berhasil',
+            'message' => 'Login berhasil',
             'token' => $token,
             'data' => $user
         ]);
@@ -113,6 +104,41 @@ class UserController extends Controller
 
         return response()->json([
             'status' => true,
+            'data' => $user
+        ]);
+    }
+
+    public function topUp(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|integer|min:1000'
+        ]);
+
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+
+        $amount = (int) $request->amount;
+        $saldoSekarang = (int) ($user->saldo ?? 0);
+
+        $user->saldo = $saldoSekarang + $amount;
+        $user->save();
+
+        WalletTransaction::create([
+            'user_id' => $user->id,
+            'type' => 'topup',
+            'amount' => $request->amount,
+            'description' => 'Top up saldo dompet'
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Top up berhasil',
             'data' => $user
         ]);
     }
