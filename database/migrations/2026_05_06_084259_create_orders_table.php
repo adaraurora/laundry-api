@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('layanan');
-            $table->integer('berat');
+            $table->decimal('berat', 5, 1);
             $table->integer('total_harga');
             $table->string('status')->default('proses');
             $table->timestamps();

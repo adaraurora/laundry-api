@@ -4,31 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\WalletTransaction;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    // Melihat semua daftar pesanan
-    public function index() {
-        return Order::with(['user', 'service'])->latest()->get();
+    public function index()
+    {
+        $orders = Order::with(['user', 'service'])
+            ->latest()
+            ->get();
+
+        return response()->json($orders);
     }
 
-    // Membuat pesanan baru (Otomatis hitung total harga)
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'service_id' => 'required|exists:services,id',
             'berat' => 'required|numeric|min:1',
-            'alamat' => 'required',
-            'metode_pembayaran' => 'nullable'
+            'alamat' => 'required|string',
+            'catatan' => 'nullable|string',
+            'metode_pembayaran' => 'nullable|string'
         ]);
 
         $user = User::find($request->user_id);
+        $service = Service::find($request->service_id);
 
         if (!$user) {
             return response()->json([
@@ -36,8 +39,6 @@ class OrderController extends Controller
                 'message' => 'User tidak ditemukan'
             ], 404);
         }
-
-        $service = Service::find($request->service_id);
 
         if (!$service) {
             return response()->json([
@@ -54,25 +55,34 @@ class OrderController extends Controller
         $diskon = 0;
         $total = (int) ($subtotal + $ongkir - $diskon);
 
-        $metodePembayaran = $request->metode_pembayaran ?? 'Saldo Dompet';
+        $metodePembayaran = $request->metode_pembayaran ?? 'wallet';
+
+        if (!in_array($metodePembayaran, ['wallet', 'transfer', 'ewallet', 'cash'])) {
+            $metodePembayaran = 'wallet';
+        }
+
         $statusPembayaran = 'belum_bayar';
 
-        if ($request->metode_pembayaran === 'Saldo Dompet') {
-            if ($user->saldo < $total) {
+        if ($metodePembayaran === 'wallet') {
+            if ((int) $user->saldo < $total) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Saldo tidak cukup'
                 ], 400);
             }
 
-            $user->saldo -= $total;
+            $user->saldo = (int) $user->saldo - $total;
             $user->save();
 
             $statusPembayaran = 'sudah_bayar';
         }
 
+        if ($metodePembayaran === 'transfer' || $metodePembayaran === 'ewallet') {
+            $statusPembayaran = 'menunggu_pembayaran';
+        }
+
         $order = Order::create([
-            'kode_order' => 'ORD-' . rand(10000, 99999),
+            'kode_order' => 'ORD-' . random_int(10000, 99999),
             'user_id' => $user->id,
             'service_id' => $service->id,
             'layanan' => $service->nama_layanan,
@@ -88,7 +98,7 @@ class OrderController extends Controller
             'estimasi_selesai' => now()->addDay()
         ]);
 
-        if ($request->metode_pembayaran === 'Saldo Dompet') {
+        if ($metodePembayaran === 'wallet') {
             WalletTransaction::create([
                 'user_id' => $user->id,
                 'type' => 'payment',
@@ -101,21 +111,20 @@ class OrderController extends Controller
             'status' => true,
             'message' => 'Pesanan berhasil dibuat',
             'data' => $order
-        ]);
+        ], 201);
     }
 
-    // Melihat detail satu pesanan secara spesifik
-    public function show($id) 
+    public function show($id)
     {
         $order = Order::with(['user', 'service'])->find($id);
-    
+
         if (!$order) {
             return response()->json([
                 'status' => false,
                 'message' => 'Pesanan tidak ditemukan'
             ], 404);
         }
-    
+
         return response()->json([
             'status' => true,
             'message' => 'Detail pesanan berhasil diambil',
@@ -123,8 +132,7 @@ class OrderController extends Controller
         ]);
     }
 
-    // Update data order secara umum
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
         $order = Order::find($id);
 
@@ -149,8 +157,7 @@ class OrderController extends Controller
         ]);
     }
 
-    // Update STATUS pesanan (KHUSUS ADMIN)
-    public function updateStatus(Request $request, $id) 
+    public function updateStatus(Request $request, $id)
     {
         $request->validate([
             'admin_id' => 'required|exists:users,id',
@@ -185,7 +192,7 @@ class OrderController extends Controller
 
             if ($user) {
                 $poinBaru = floor($order->total_harga / 10000);
-                $user->poin += $poinBaru;
+                $user->poin = (int) $user->poin + $poinBaru;
                 $user->save();
             }
         }
@@ -197,14 +204,23 @@ class OrderController extends Controller
         ]);
     }
 
-    // Menghapus pesanan
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $order = Order::find($id);
-        if ($order) {
-            $order->delete();
-            return response()->json(['message' => 'Pesanan berhasil dihapus']);
+
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
         }
-        return response()->json(['message' => 'Pesanan tidak ditemukan'], 404);
+
+        $order->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pesanan berhasil dihapus'
+        ]);
     }
 
     public function byUser($id)
