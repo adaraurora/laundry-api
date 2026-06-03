@@ -70,7 +70,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 ====================================================
-README - [NAMA APLIKASI]
+README - Neatify
 ====================================================
 
 1. Nama Aplikasi
