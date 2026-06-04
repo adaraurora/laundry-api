@@ -69,50 +69,70 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 
-====================================================
-README - Neatify
-====================================================
+====================
+README - Neatify ====================
+
 
 1. Nama Aplikasi
-----------------------------------------------------
+
 Neatify
+----------------------------------------------------
 
 2. Deskripsi Aplikasi
-----------------------------------------------------
+
 Neatify adalah aplikasi laundry berbasis mobile yang dirancang untuk memudahkan pelanggan dalam mengelola kebutuhan laundry secara praktis dan efisien. Aplikasi ini menyediakan fitur registrasi dan login untuk mengelola akun pengguna, serta sistem saldo dan poin yang dapat digunakan sebagai bentuk apresiasi kepada pelanggan. Poin yang diperoleh dari transaksi dapat ditukarkan dengan berbagai keuntungan yang tersedia di dalam aplikasi.
 
 Neatify menawarkan berbagai layanan laundry, antara lain Cuci Kering, Cuci Setrika, Setrika Saja, Cuci Kilat, Laundry Sepatu, dan Laundry Bed Cover. Pengguna dapat memilih layanan sesuai kebutuhan dan melakukan pemesanan secara langsung melalui aplikasi.
 
 Selain itu, Neatify dilengkapi dengan fitur pemantauan status pesanan secara real-time, sehingga pengguna dapat mengetahui perkembangan pesanan mereka dengan mudah. Status pesanan dibagi menjadi tiga tahap, yaitu Pending (pesanan diterima dan menunggu diproses), Diproses (pesanan sedang dikerjakan), dan Selesai (pesanan telah selesai dikerjakan dan siap diambil atau dikirim). Dengan fitur-fitur tersebut, Neatify bertujuan memberikan pengalaman layanan laundry yang lebih modern, transparan, dan nyaman bagi pelanggan.
+----------------------------------------------------
 
 3. Anggota Kelompok
-----------------------------------------------------
+
 1. Adara Aurora Kusuma - XI PPLG 4/02
 2. Khafidz Riziq Ikhsani - XI PPLG 4/16
 3. Mezzaluna Azzafira - XI PPLG 4/17
 4. Razya Fahmi Afrianto - XI PPLG 4/25
+----------------------------------------------------
 
 4. Pembagian Tugas
-----------------------------------------------------
-[Nama Anggota 1]
+
+[Adara Aurora Kusuma]
 - Analisis kebutuhan aplikasi
+- Implementasi frontend Android
+- Pengembangan backend/API
+- Deployment dan build APK
 - Perancangan database
 - Dokumentasi
-
-[Nama Anggota 2]
-- Pengembangan backend/API
-- Integrasi database
-
-[Nama Anggota 3]
-- Desain UI/UX
-- Implementasi frontend Android
-
-[Nama Anggota 4]
 - Pengujian aplikasi
-- Deployment dan build APK
+- README
+
+[Khafidz Riziq Ikhsani]
+- Pengembangan backend/API
+- Perancangan database
+- Integrasi database
+- Dokumentasi
+- Dashboard Admin
+- README
+
+[Mezzaluna Azzafira]
+- Desain UI/UX
+- Analisis kebutuhan aplikasi
+- Pengembangan backend/API
+- Dokumentasi
+- README
+
+[Razya Fahmi Afrianto]
+- Pengujian aplikasi
+- Pengembangan backend/API
+- Analisis kebutuhan aplikasi
+- Dashboard Admin
+- Dokumentasi
+- README
+----------------------------------------------------
 
 5. Fitur Aplikasi
-----------------------------------------------------
+
 1. Registrasi akun pengguna
 2. Login dan logout
 3. Manajemen profil pengguna
@@ -134,20 +154,20 @@ Selain itu, Neatify dilengkapi dengan fitur pemantauan status pesanan secara rea
 16. Manajemen data layanan
 17. Manajemen data pesanan
 18. Pembaruan status pesanan oleh admin
+----------------------------------------------------
 
 6. Link Repository / Source Code
-----------------------------------------------------
+
 https://github.com/adaraurora/laundry-api.git
+----------------------------------------------------
 
 7. Link APK / Hasil Build
-----------------------------------------------------
-[Masukkan link Google Drive, GitHub Release, dll.]
 
-Contoh:
-https://drive.google.com/xxxxxxxx
+https://drive.google.com/drive/u/1/folders/1XKdywyr_AFtoxAj33D7uZ378A0mxEssw
+----------------------------------------------------
 
 8. Teknologi yang Digunakan
-----------------------------------------------------
+
 - Android Studio
 - Java / Kotlin
 - Laravel API
